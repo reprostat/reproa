@@ -51,15 +51,16 @@ jobs:
     - run: mkdir -p ${HOME}/outputs<< parameters.dataset >>
 
     - run:
-        name: print version
+        name: Print version
         command: |
           docker run -ti --rm \
             --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" --workdir="$HOME" \
             -v /tmp/workspace/data/ds114_test1:/bids_dataset \
               bids/${CIRCLE_PROJECT_REPONAME,,} --version
+        no_output_timeout: 1h
 
-        # participant level tests for single session dataset
     - run:
+        name: Participant level test for 01
         command: |
           docker run -ti --rm \
             --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" --workdir="$HOME" \
@@ -68,6 +69,7 @@ jobs:
               bids/${CIRCLE_PROJECT_REPONAME,,} /bids_dataset /outputs participant --participant_label 01
         no_output_timeout: 6h
     - run:
+        name: Participant level test for 02    
         command: |
           docker run -ti --rm \
             --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" --workdir="$HOME" \
@@ -77,6 +79,7 @@ jobs:
         no_output_timeout: 6h
 
     - run:
+        name: Group level test    
         command: |
           docker run -ti --rm \
             --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" --workdir="$HOME" \
