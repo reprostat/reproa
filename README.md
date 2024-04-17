@@ -49,6 +49,7 @@ This App has the following command line arguments:
 To run it in participant level mode (for one participant):
 
     docker run -i --rm \
+        --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" --workdir="$HOME" \
 		-v /Users/filo/data/ds005:/bids_dataset:ro \
 		-v /Users/filo/outputs:/outputs \
 		bids/example \
@@ -58,6 +59,7 @@ After doing this for all subjects (potentially in parallel), the group level ana
 can be run:
 
     docker run -i --rm \
+        --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" --workdir="$HOME" \
 		-v /Users/filo/data/ds005:/bids_dataset:ro \
 		-v /Users/filo/outputs:/outputs \
 		bids/example \

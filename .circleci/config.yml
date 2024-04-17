@@ -54,6 +54,7 @@ jobs:
         name: print version
         command: |
           docker run -ti --rm --read-only \
+            --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" --workdir="$HOME" \
             -v /tmp/workspace/data/ds114_test1:/bids_dataset \
               bids/${CIRCLE_PROJECT_REPONAME,,} --version
 
@@ -61,6 +62,7 @@ jobs:
     - run:
         command: |
           docker run -ti --rm --read-only \
+            --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" --workdir="$HOME" \
             -v /tmp/workspace/data/ds114_test<< parameters.dataset >>:/bids_dataset \
             -v ${HOME}/outputs<< parameters.dataset >>:/outputs \
               bids/${CIRCLE_PROJECT_REPONAME,,} /bids_dataset /outputs participant --participant_label 01
@@ -68,6 +70,7 @@ jobs:
     - run:
         command: |
           docker run -ti --rm --read-only \
+            --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" --workdir="$HOME" \
             -v /tmp/workspace/data/ds114_test<< parameters.dataset >>:/bids_dataset \
             -v ${HOME}/outputs<< parameters.dataset >>:/outputs \
               bids/${CIRCLE_PROJECT_REPONAME,,} /bids_dataset /outputs participant --participant_label 02
@@ -76,6 +79,7 @@ jobs:
     - run:
         command: |
           docker run -ti --rm --read-only \
+            --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" --workdir="$HOME" \
             -v /tmp/workspace/data/ds114_test<< parameters.dataset >>:/bids_dataset \
             -v ${HOME}/outputs1:/outputs \
               bids/${CIRCLE_PROJECT_REPONAME,,} /bids_dataset /outputs group
