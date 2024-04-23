@@ -99,16 +99,25 @@ RUN printf '{ \
   ] \
 }' > /.reproenv.json
 
+ENV TOOLS_DIR=/opt/software
+
+# spm12
+ENV SPM_VER=7771
+RUN wget --progress=dot:mega -P /opt https://github.com/spm/spm12/archive/refs/tags/r${SPM_VER}.tar.gz && \
+    tar -xzf /opt/r${SPM_VER}.tar.gz -C ${TOOLS_DIR} && \
+    mv ${TOOLS_DIR}/spm12-r${SPM_VER} ${TOOLS_DIR}/spm12 && \
+    rm /opt/r${SPM_VER}.tar.gz
+
 # reproa
-ENV REPROA_DIR=/opt/software/reproanalysis
 RUN wget --progress=dot:mega -P /opt https://github.com/reprostat/reproanalysis/releases/download/${REPROA_VER}/reproa-${REPROA_VER}.tar.gz && \
-    tar -xzf /opt/reproa-${REPROA_VER}.tar.gz -C /opt/software && \
-    mv /opt/software/reproa-${REPROA_VER} ${REPROA_DIR} && \
+    tar -xzf /opt/reproa-${REPROA_VER}.tar.gz -C ${TOOLS_DIR} && \
+    mv ${TOOLS_DIR}/reproa-${REPROA_VER} ${TOOLS_DIR}/reproanalysis && \
     rm /opt/reproa-${REPROA_VER}.tar.gz
+COPY reproa_bidsapp/reproa_bidsapp.m reproa_bidsapp/run.sh reproa_bidsapp/version ${TOOLS_DIR}/reproanalysis/
+RUN chmod +x ${TOOLS_DIR}/reproanalysis/run.sh
+RUN mkdir $HOME/.reproa
+COPY reproa_bidsapp/parameters.xml $HOME/.reproa/reproa_parameters_user.xml
 
-COPY reproa_bidsapp.m run.sh version ${REPROA_DIR}/
-RUN chmod +x ${REPROA_DIR}/run.sh
-
-COPY version /version
+COPY reproa_bidsapp/version /version
 
 ENTRYPOINT ["/opt/software/reproanalysis/run.sh"]

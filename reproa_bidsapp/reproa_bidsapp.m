@@ -23,7 +23,7 @@ reproaSetup()
 args = argv();
 
 % Help
-if ismember({'-h' '--help'},args)
+if any(ismember({'-h' '--help'},args))
     fprintf([...
             'Usage: bids/reproa BIDS_DIR OUTPUT_DIR LEVEL [OPTIONS]\n',...
             '       bids/reproa [ -h | --help | -v | --version ]\n',...
@@ -48,11 +48,11 @@ if ismember({'-h' '--help'},args)
 end
 
 % Version
-if ismember({'-v' '--version'},args)
+if any(ismember({'-v' '--version'},args))
     meta = jsonread(fullfile(REPRODIR,'.zenodo.json'));
 
     fprintf('Reproducible Analysis BIDS App %s (reproa version: %s\n',...            
-            deblank(fileread(fullfile(REPRODIR,'version'))),...
+            deblank(fileread('/version')),...
             meta.version);
     exit(0);            
 end
@@ -64,8 +64,8 @@ args(indParamName) = strrep(args(indParamName), '--', '');
 argParse = inputParser;
 argParse.addRequired('bidsdir',@ischar);
 argParse.addRequired('outdir',@ischar);
-argParse.addRequired('level',@ischar);
-argParse.addParameter('participant_label',{},@iscellstr);
+argParse.addRequired('level',@(x) ischar(x) && ismember(x, {'participant' 'group'}));
+argParse.addParameter('participant_label','',@(x) ischar(x) && ~isempty(x));
 argParse.addParameter('config','',@ischar);
 argParse.addSwitch('skip_bids_validator');
 argParse.parse(args{:});
