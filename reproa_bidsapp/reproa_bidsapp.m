@@ -11,12 +11,12 @@
 % Copyright (C) 2023-2024 ReproImagine
 % Tibor Auer
 
-REPRODIR = '/opt/software/reproanalysis';
+REPROADIR = '/opt/software/reproanalysis';
 
 %% Initialise
 setenv('DEBIAN_FRONTEND','noninteractive');
 graphics_toolkit('qt');
-addpath(REPRODIR)
+addpath(REPROADIR)
 reproaSetup()
 
 %% Arguments
