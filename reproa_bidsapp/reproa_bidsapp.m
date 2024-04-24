@@ -49,7 +49,7 @@ end
 
 % Version
 if any(ismember({'-v' '--version'},args))
-    meta = jsonread(fullfile(REPRODIR,'.zenodo.json'));
+    meta = jsonread(fullfile(REPROADIR,'.zenodo.json'));
 
     fprintf('Reproducible Analysis BIDS App %s (reproa version: %s\n',...            
             deblank(fileread('/version')),...
