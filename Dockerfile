@@ -1,4 +1,4 @@
-FROM reprostat/octave:8.4.4
+FROM reprostat/octave:9.1.0
 
 ENV REPROA_VER=0.1.0
 
@@ -112,12 +112,11 @@ RUN wget --progress=dot:mega -P /opt https://github.com/spm/spm12/archive/refs/t
 RUN wget --progress=dot:mega -P /opt https://github.com/reprostat/reproanalysis/releases/download/${REPROA_VER}/reproa-${REPROA_VER}.tar.gz && \
     tar -xzf /opt/reproa-${REPROA_VER}.tar.gz -C ${TOOLS_DIR} && \
     mv ${TOOLS_DIR}/reproa-${REPROA_VER} ${TOOLS_DIR}/reproanalysis && \
-    rm /opt/reproa-${REPROA_VER}.tar.gz
-COPY reproa_bidsapp/reproa_bidsapp.m reproa_bidsapp/run.sh reproa_bidsapp/version ${TOOLS_DIR}/reproanalysis/
-RUN chmod +x ${TOOLS_DIR}/reproanalysis/run.sh
-RUN mkdir $HOME/.reproa
-COPY reproa_bidsapp/parameters.xml $HOME/.reproa/reproa_parameters_user.xml
+    rm /opt/reproa-${REPROA_VER}.tar.gz && \
+    mkdir ${TOOLS_DIR}/reproa_bidsapp
+COPY reproa_bidsapp ${TOOLS_DIR}/reproa_bidsapp/
+RUN chmod +x ${TOOLS_DIR}/reproa_bidsapp/run.sh
 
 COPY reproa_bidsapp/version /version
 
-ENTRYPOINT ["/opt/software/reproanalysis/run.sh"]
+ENTRYPOINT ["/opt/software/reproa_bidsapp/run.sh"]
