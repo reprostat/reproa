@@ -7,6 +7,8 @@
 %
 % See also:
 %   BIDS Validator: https://github.com/bids-standard/bids-validator
+%   Octave: https://octave.org
+%   SPM: http://www.fil.ion.ucl.ac.uk/spm
 %
 % Copyright (C) 2023-2024 ReproImagine
 % Tibor Auer

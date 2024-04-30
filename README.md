@@ -1,73 +1,75 @@
-## An example BIDS App (template repository)
-Every BIDS App needs to follow a minimal set of command arguments common across
-all of the Apps. This allows users and developers to easily use and integrate
-BIDS Apps with their environment.
+# ReproAnalysis BIDS App
 
-This is a minimalist example of a BIDS App consisting of a Dockerfile and a simple
-entry point script (written in this case in Python) accepting the standard BIDS
-Apps command line arguments. This repository can be used as a template for new BIDS Apps.
+## Description
 
-For more information about the specification of BIDS Apps see [here](https://docs.google.com/document/d/1E1Wi5ONvOVVnGhj21S1bmJJ4kyHFT7tkxnV3C23sjIE/).
+[BIDS App](http://bids-apps.neuroimaging.io) containing an instance of the [_reproa_ software](http://github.com/reprostat/reproanalysis) running under [Octave](https://octave.org) with minimum dependencies, including
+- [BIDS Validator](https://github.com/bids-standard/bids-validator)
+- [SPM](http://www.fil.ion.ucl.ac.uk/spm)
 
-### Description
-This is a placeholder for a short description explaining to the user what your App will doing.
+## Documentation
 
-### Documentation
-Provide a link to the documentation of your pipeline.
+More documentation can be found at [the ReproStat project website](http://github.com/reprostat).
 
-### How to report errors
-Provide instructions for users on how to get help and report errors.
+## Usage
 
-### Acknowledgments
-Describe how would you would like users to acknowledge use of your App in their papers (citation, a paragraph that can be copy pasted, etc.)
+### Notes on figure and video generation
+Octave relies on a QT backend for graphics. It requires access to the display, which must be provided by passing a couple of variables and volumes to the container. The processing pipeline uses a couple of Octave packages, which will be downloaded and installed if needed. It requires access to the internet, which must be provided by passing `--network=host` to the container. Therefore, the list of parameters for launching the instance of the container may be more exhaustive than for other BIDS Apps.
 
-### Usage
-This App has the following command line arguments:
+### Format
+To launch an instance of the container and analyse some data in BIDS format, type:
 
-	usage: run.py [-h] [--participant_label PARTICIPANT_LABEL [PARTICIPANT_LABEL ...]] [--skip_bids_validator] [-v]
-				bids_dir output_dir {participant,group}
+```bash
+$ docker run -ti --rm \
+	--user $(id -u):$(id -g) --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" \
+	--network=host \
+	bids/reproa bids_dir output_dir <level> [--participant_label PARTICIPANT_LABEL [PARTICIPANT_LABEL ...]] [--config CFG_FILE] [--skip_bids_validator]
+```
 
-	Example BIDS App entrypoint script.
+For example, to run an analysis in ```participant``` level mode using the default (as descibed in SPM manual, chapter 30) workflow, type:
 
-	positional arguments:
-	bids_dir              The directory with the input dataset formatted according to the BIDS standard.
-	output_dir            The directory where the output files should be stored. If you are running group level analysis this folder should
-							be prepopulated with the results of theparticipant level analysis.
-	{participant,group}   Level of the analysis that will be performed. Multiple participant level analyses can be run independently (in
-							parallel) using the same output_dir.
+```bash
+$ docker run -ti --rm \
+	--user $(id -u):$(id -g) --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" \
+	--network=host \
+  	-v /path/to/local/bids/input/dataset/:/data \
+  	-v /path/to/local/output/:/output \
+  	bids/reproa /data /output participant --participant_label 01
+```
 
-	options:
-	-h, --help            show this help message and exit
-	--participant_label PARTICIPANT_LABEL [PARTICIPANT_LABEL ...]
-							The label(s) of the participant(s) that should be analyzed. The label corresponds to sub-<participant_label> from
-							the BIDS spec (so it does not include "sub-"). If this parameter is not provided all subjects should be analyzed.
-							Multiple participants can be specified with a space separated list.
-	--skip_bids_validator
-							Whether or not to perform BIDS dataset validation
-	-v, --version         show program's version number and exit
+For example, to run an analysis in ```group``` level mode with a user-defined workflow, type:
 
-To run it in participant level mode (for one participant):
+```bash
+$ docker run -ti --rm \
+	--user $(id -u):$(id -g) --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" \
+	--network=host \
+	-v /path/to/local/bids/input/dataset/:/data \
+	-v /path/to/local/output/:/output \
+	-v /path/to/local/cfg/:/cfg \
+	bids/reproa \
+	/data /output group --config /cfg/my_workflow_group.json
+```
 
-    docker run -i --rm \
-        --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" --workdir="$HOME" \
-		-v /Users/filo/data/ds005:/bids_dataset:ro \
-		-v /Users/filo/outputs:/outputs \
-		bids/example \
-		/bids_dataset /outputs participant --participant_label 01
+To build the container, type:
 
-After doing this for all subjects (potentially in parallel), the group level analysis
-can be run:
+```bash
+$ docker build -t <yourhandle>/reproa .
+```
 
-    docker run -i --rm \
-        --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" --workdir="$HOME" \
-		-v /Users/filo/data/ds005:/bids_dataset:ro \
-		-v /Users/filo/outputs:/outputs \
-		bids/example \
-		/bids_dataset /outputs group
+### Configuration file
 
-### Special considerations
-Describe whether your app has any special requirements. For example:
+The configuration file is an OCTAVE script detailing the analysis workflow to be executed. It has two parts:
 
-- Multiple map reduce steps (participant, group, participant2, group2 etc.)
-- Unusual memory requirements
-- etc.
+#### Specifaction of the tasklist
+The first part specifies the tasklist.
+
+#### Parametrisation of the tasklist
+The second part customises the tasklist.
+
+```matlab
+```
+
+## Error Reporting
+
+If you have a specific problem with the ReproAnalysis BIDS App, please open an [issue](https://github.com/reprostat/reproa/issues) on GitHub.
+
+If your issue concerns ReproAnalysis more generally, please open an [issue](https://github.com/reprostat/reproanalysis/issues) on GitHub.
