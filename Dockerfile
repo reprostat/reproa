@@ -1,6 +1,6 @@
 FROM reprostat/octave:9.2.0
 
-ENV REPROA_VER=0.1.0
+ENV REPROA_VER=0.2.0
 
 LABEL org.opencontainers.image.authors="ReproStat <https://github.com/reprostat>"
 LABEL org.opencontainers.image.source="https://github.com/reprostat/reproanalysis"
