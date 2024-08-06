@@ -20,7 +20,7 @@ To launch an instance of the container and analyse some data in BIDS format, typ
 
 ```bash
 $ docker run -ti --rm \
-	--user $(id -u):$(id -g) --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" \
+	--user $(id -u):$(id -g) --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:ro" --volume="${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}:rw" \
 	--network=host \
 	bids/reproa bids_dir output_dir <level> [--participant_label PARTICIPANT_LABEL [PARTICIPANT_LABEL ...]] [--config CFG_FILE] [--skip_bids_validator]
 ```
@@ -29,7 +29,7 @@ For example, to run an analysis in ```participant``` level mode using the defaul
 
 ```bash
 $ docker run -ti --rm \
-	--user $(id -u):$(id -g) --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" \
+	--user $(id -u):$(id -g) --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:ro" --volume="${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}:rw" \
 	--network=host \
   	-v /path/to/local/bids/input/dataset/:/data \
   	-v /path/to/local/output/:/output \
@@ -40,7 +40,7 @@ For example, to run an analysis in ```group``` level mode with a user-defined wo
 
 ```bash
 $ docker run -ti --rm \
-	--user $(id -u):$(id -g) --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" \
+	--user $(id -u):$(id -g) --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:ro" --volume="${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}:rw" \
 	--network=host \
 	-v /path/to/local/bids/input/dataset/:/data \
 	-v /path/to/local/output/:/output \

@@ -54,7 +54,7 @@ jobs:
         name: Print version
         command: |
           docker run -ti --rm \
-            --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" \
+            --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:ro" --volume="${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}:rw" \
             -v /tmp/workspace/data/ds114_test1:/bids_dataset \
               bids/${CIRCLE_PROJECT_REPONAME,,} --version
         no_output_timeout: 1h
@@ -63,7 +63,7 @@ jobs:
         name: Participant level test for 01
         command: |
           docker run -ti --rm \
-            --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" \
+            --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:ro" --volume="${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}:rw" \
             -v /tmp/workspace/data/ds114_test<< parameters.dataset >>:/bids_dataset \
             -v ${HOME}/outputs<< parameters.dataset >>:/outputs \
               bids/${CIRCLE_PROJECT_REPONAME,,} /bids_dataset /outputs participant --participant_label 01
@@ -72,7 +72,7 @@ jobs:
         name: Participant level test for 02    
         command: |
           docker run -ti --rm \
-            --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" \
+            --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:ro" --volume="${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}:rw" \
             -v /tmp/workspace/data/ds114_test<< parameters.dataset >>:/bids_dataset \
             -v ${HOME}/outputs<< parameters.dataset >>:/outputs \
               bids/${CIRCLE_PROJECT_REPONAME,,} /bids_dataset /outputs participant --participant_label 02
@@ -82,7 +82,7 @@ jobs:
         name: Group level test    
         command: |
           docker run -ti --rm \
-            --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:rw" --volume="/run/user:/run/user:rw" \
+            --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:ro" --volume="${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}:rw" \
             -v /tmp/workspace/data/ds114_test<< parameters.dataset >>:/bids_dataset \
             -v ${HOME}/outputs1:/outputs \
               bids/${CIRCLE_PROJECT_REPONAME,,} /bids_dataset /outputs group
