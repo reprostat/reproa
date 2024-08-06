@@ -39,9 +39,10 @@ if isempty(args) || any(ismember({'-h' '--help'},args))
             'Options:\n',...
             '    --participant_label PARTICIPANT_LABEL [PARTICIPANT_LABEL ...]\n',...
             '                    Label(s) of the participant(s) to analyse\n',...
-            '    --config CONFIG_FILE\n',...
-            '                    Optional configuration M-file describing\n',...
-            '                    the analysis to be performed\n',...
+            '    --config TASKLIST:USERSCRIP\n',...
+            '                    Optional tsklist (XML-file) and user script (M-file)\n',...
+            '                    describing the analysis to be performed.\n',...
+            '                    The two files MUST be specified as a single string seperated by colon.'
             '    --skip_bids_validator\n',...
             '                    Skip BIDS validation\n',...
             '    -h, --help      Print usage\n',...
@@ -72,3 +73,27 @@ argParse.addParameter('config','',@ischar);
 argParse.addSwitch('skip_bids_validator');
 argParse.parse(args{:});
 BIDSApp = argParse.Results
+
+% Validate data against BIDS
+if ~BIDSApp.skip_bids_validator
+    if system('bids-validator --version'), logging.error('bids-validator is not found or working properly'); end
+    [status, report] = system(['bids-validator "' BIDSApp.bidsdir '"']);
+    if status, logging.error(report); end
+end
+
+% Run analysis
+% - parse config
+if isempty(BIDSApp.config), logging.warning('No analysis is specified'); end
+analysis = strsplit(BIDSApp.config,':');
+if numel(analysis) ~= 2 || ~all(ismember(spm_file(analysis,'ext'),{'xml','m'}))
+    logging.error('Analysis MUST be specified as a pair of tasklist and user script. Use -h or --help.'); 
+end
+
+workflow = analysis{strcmp(spm_file(analysis,'ext'),'xml')};
+userscript = analysis{strcmp(spm_file(analysis,'ext'),'m')};
+
+rap = reproaWorkflow(workflow);
+
+if isdeployed, evalin('base',fileread(userscript));
+else, run(userscript);
+end
