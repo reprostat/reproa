@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rap>
+    <!-- data -->
+    <module><name>reproa_fromnifti_structural</name></module>
+    <module><name>reproa_fromnifti_fmri</name></module>
+
+    <!-- preprocessing -->
+    <module><name>reproa_timeseriesqc_fmri</name></module>
+    <module><name>reproa_realign</name></module>
+    <module><name>reproa_coregextended</name></module>
+    <module><name>reproa_segment</name></module>
+    <module><name>reproa_normwrite_fmri</name></module>
+    <module><name>reproa_smooth_fmri</name></module>
+    <module><name>reproa_timeseriesqc_fmri</name></module>
+
+    <!-- statistics -->
+    <module>
+        <branch>
+            <analysisidsuffix>_fingerfootlips</analysisidsuffix>
+            <selectedruns>fingerfootlips</selectedruns>
+            <module><name>reproa_firstlevelmodel</name></module>
+            <module><name>reproa_firstlevelcontrasts</name></module>
+            <module><name>reproa_firstlevelthreshold</name></module>
+        </branch>
+        <branch>
+            <analysisidsuffix>_linebisection</analysisidsuffix>
+            <selectedruns>linebisection</selectedruns>
+            <module><name>reproa_firstlevelmodel</name></module>
+            <module><name>reproa_firstlevelcontrasts</name></module>
+            <module><name>reproa_firstlevelthreshold</name></module>
+        </branch>
+    </module>
+</rap>

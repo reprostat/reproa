@@ -1,33 +1,15 @@
-%% Workflow
-modules = {'reproa_fromnifti_structural';
-           'reproa_fromnifti_fmri';
-           'reproa_timeseriesqc_fmri';
-           'reproa_realign';
-           'reproa_coregextended';
-           'reproa_segment';
-           'reproa_normwrite_fmri';
-           'reproa_smooth_fmri';
-           'reproa_timeseriesqc_fmri'};
-modules{end+1,2} = {'_fingerfootlips' 'fingerfootlips' {'reproa_firstlevelmodel';
-                                                        'reproa_firstlevelcontrasts';
-                                                        'reproa_firstlevelthreshold'};
-                    '_linebisection' 'linebisection' {'reproa_firstlevelmodel';
-                                                      'reproa_firstlevelcontrasts';
-                                                      'reproa_firstlevelthreshold'}};
-rap = reproaWorkflow(modules);
-
 %% Data
-rap.directoryconventions.rawdatadir = 'D:\Data\ds114_test1';
+rap.directoryconventions.rawdatadir = '/data';
 rap.tasksettings.reproa_fromnifti_fmri.numdummies = 1;
 rap.acqdetails.input.correctEVfordummies = 1;
 rap = processBIDS(rap);
 
 %% Output
-rap.acqdetails.root = 'D:\Analyses';
+rap.acqdetails.root = '/outputs';
 rap.directoryconventions.analysisid = 'ds114_test1';
 
 % Computing
-rap.directoryconventions.poolprofile = 'local_PS';
+rap.directoryconventions.poolprofile = 'local_sh';
 rap.options.wheretoprocess = 'batch';
 rap.options.parallelresources.numberofworkers = 4;
 rap.options.parallelresources.memory = 4;
