@@ -31,9 +31,10 @@ For example, to run an analysis in ```participant``` level mode using the defaul
 $ docker run -ti --rm \
 	--user $(id -u):$(id -g) --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:ro" --volume="${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}:rw" \
 	--network=host \
-  	-v /path/to/local/bids/input/dataset/:/data \
-  	-v /path/to/local/output/:/output \
-  	bids/reproa /data /output participant --participant_label 01
+  	--volume=/path/to/local/bids/input/dataset/:/data \
+  	--volume=/path/to/local/output/:/output \
+	--volume=/path/to/local/cfg/:/cfg \
+  	bids/reproa /data /output participant --participant_label 01 --config /cfg/tasklist.xml:/cfg/userscript.m
 ```
 
 For example, to run an analysis in ```group``` level mode with a user-defined workflow, type:
@@ -42,11 +43,10 @@ For example, to run an analysis in ```group``` level mode with a user-defined wo
 $ docker run -ti --rm \
 	--user $(id -u):$(id -g) --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:ro" --volume="${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}:rw" \
 	--network=host \
-	-v /path/to/local/bids/input/dataset/:/data \
-	-v /path/to/local/output/:/output \
-	-v /path/to/local/cfg/:/cfg \
-	bids/reproa \
-	/data /output group --config /cfg/my_workflow_group.json
+	--volume=/path/to/local/bids/input/dataset/:/data \
+	--volume=/path/to/local/output/:/output \
+	--volume=/path/to/local/cfg/:/cfg \
+	bids/reproa /data /output group --config /cfg/tasklist.xml:/cfg/userscript.m
 ```
 
 To build the container, type:
@@ -55,7 +55,7 @@ To build the container, type:
 $ docker build -t <yourhandle>/reproa .
 ```
 
-### Configuration file
+### Configuration files
 
 The configuration file is an OCTAVE script detailing the analysis workflow to be executed. It has two parts:
 
