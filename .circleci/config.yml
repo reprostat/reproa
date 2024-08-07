@@ -77,7 +77,7 @@ jobs:
             --volume=${HOME}/outputs<< parameters.dataset >>/participant:/outputs \
             --volume=$GITHUB_WORKSPACE/tests:/config \
             bids/${CIRCLE_PROJECT_REPONAME,,} /bids_dataset /outputs participant --participant_label 01 \
-            --config /config/ds114_test<< parameters.dataset >>.xml:/config/ds114_test<< parameters.dataset >>.m \
+            --config /config/ds114_test<< parameters.dataset >>.xml,/config/ds114_test<< parameters.dataset >>.m \
             --skip_bids_validator
         no_output_timeout: 6h
 
@@ -91,7 +91,7 @@ jobs:
             --volume=${HOME}/outputs<< parameters.dataset >>/participant:/outputs \
             --volume=$GITHUB_WORKSPACE/tests:/config \
             bids/${CIRCLE_PROJECT_REPONAME,,} /bids_dataset /outputs participant --participant_label 02 \
-            --config /config/ds114_test<< parameters.dataset >>.xml:/config/ds114_test<< parameters.dataset >>.m \
+            --config /config/ds114_test<< parameters.dataset >>.xml,/config/ds114_test<< parameters.dataset >>.m \
             --skip_bids_validator
         no_output_timeout: 6h
     
@@ -105,7 +105,7 @@ jobs:
             --volume=${HOME}/outputs<< parameters.dataset >>/group:/outputs \
             --volume=$GITHUB_WORKSPACE/tests:/config \
             bids/${CIRCLE_PROJECT_REPONAME,,} /bids_dataset /outputs group \
-            --config /config/ds114_test<< parameters.dataset >>.xml:/config/ds114_test<< parameters.dataset >>.m \
+            --config /config/ds114_test<< parameters.dataset >>.xml,/config/ds114_test<< parameters.dataset >>.m \
             --skip_bids_validator
         no_output_timeout: 6h
 
