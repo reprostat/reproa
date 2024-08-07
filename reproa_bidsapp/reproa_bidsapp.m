@@ -17,9 +17,6 @@ REPROADIR = '/opt/software/reproanalysis';
 
 %% Initialise
 setenv('DEBIAN_FRONTEND','noninteractive');
-graphics_toolkit('qt');
-addpath(REPROADIR)
-reproaSetup()
 
 %% Arguments
 args = argv();
@@ -37,18 +34,22 @@ if isempty(args) || any(ismember({'-h' '--help'},args))
             '                    {participant,group}\n',...
             '\n',...
             'Options:\n',...
-            '    --participant_label PARTICIPANT_LABEL [PARTICIPANT_LABEL ...]\n',...
+            '    --participant_label PARTICIPANT_LABEL[,PARTICIPANT_LABEL ...]\n',...
             '                    Label(s) of the participant(s) to analyse\n',...
-            '    --config TASKLIST:USERSCRIP\n',...
-            '                    Optional tsklist (XML-file) and user script (M-file)\n',...
+            '    --config TASKLIST,USERSCRIPT\n',...
+            '                    Tasklist (XML-file) and user script (M-file)\n',...
             '                    describing the analysis to be performed.\n',...
-            '                    The two files MUST be specified as a single string seperated by colon.'
             '    --skip_bids_validator\n',...
             '                    Skip BIDS validation\n',...
             '    -h, --help      Print usage\n',...
             '    -v, --version   Print version information and quit\n']);
     exit(0);
 end
+
+% Init reproa
+graphics_toolkit('qt');
+addpath(REPROADIR)
+reproaSetup()
 
 % Version
 if any(ismember({'-v' '--version'},args))
@@ -84,16 +85,20 @@ end
 % Run analysis
 % - parse config
 if isempty(BIDSApp.config), logging.warning('No analysis is specified'); end
-analysis = strsplit(BIDSApp.config,':');
+analysis = strsplit(BIDSApp.config,',');
 if numel(analysis) ~= 2 || ~all(ismember(spm_file(analysis,'ext'),{'xml','m'}))
     logging.error('Analysis MUST be specified as a pair of tasklist and user script. Use -h or --help.'); 
 end
-
 workflow = analysis{strcmp(spm_file(analysis,'ext'),'xml')};
 userscript = analysis{strcmp(spm_file(analysis,'ext'),'m')};
 
+% - set up workflow
 rap = reproaWorkflow(workflow);
+if strcmp(BIDSApp.level, 'participant')
+    rap.acqdetails.input.selectedsubjects = strsplit(BIDSApp.participant_label,',');
+end
 
+% - run workflow
 if isdeployed, evalin('base',fileread(userscript));
 else, run(userscript);
 end
