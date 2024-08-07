@@ -85,7 +85,12 @@ The first file specifies workflow based on the tasklist. It is an XML file and f
 - [ds_114_test2.xml](tests/ds114_test2.xml)
 
 #### User script
-The second file is the user script parametrising the workflow. It is an OCTAVE/MATLAB M-file and follows the same structure as for the ReproAnalysis software with one exception. You MUST NOT include `reproaSetup` and `reproaWorkflow` but consider them already executed based on the tasklist by the time of the execution of your script. You can find examples in the test folder:
+The second file is the user script parametrising the workflow. It is an OCTAVE/MATLAB M-file and follows the same structure as for the ReproAnalysis software with a few exceptions. 
+- You MUST NOT call `reproaSetup` and `reproaWorkflow` but consider them already executed based on the tasklist by the time of the execution of your script.
+- You MUST NOT specify `rap.directoryconventions.rawdatadir`, as it is already set to point to the BIDS dataset. However, you MUST call `processBIDS`, as your customisation may define its behaviour.
+- You MUST NOT specify `ap.acqdetails.root` and `rap.directoryconventions.analysisid`, as they will be set to point to the BIDS App output and the script name, respectively.
+
+You can find examples in the test folder:
 - [ds_114_test1.m](tests/ds114_test1.m)
 - [ds_114_test2.m](tests/ds114_test2.m)
 

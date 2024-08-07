@@ -94,9 +94,12 @@ userscript = analysis{strcmp(spm_file(analysis,'ext'),'m')};
 
 % - set up workflow
 rap = reproaWorkflow(workflow);
+rap.directoryconventions.rawdatadir = BIDSApp.bidsdir;
 if strcmp(BIDSApp.level, 'participant')
     rap.acqdetails.input.selectedsubjects = strsplit(BIDSApp.participant_label,',');
 end
+rap.acqdetails.root = BIDSApp.outdir;
+rap.directoryconventions.analysisid = spm_file(userscript,'basename');
 
 % - run workflow
 if isdeployed, evalin('base',fileread(userscript));

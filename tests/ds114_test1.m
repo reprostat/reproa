@@ -1,12 +1,7 @@
 %% Data
-rap.directoryconventions.rawdatadir = '/data';
 rap.tasksettings.reproa_fromnifti_fmri.numdummies = 1;
 rap.acqdetails.input.correctEVfordummies = 1;
 rap = processBIDS(rap);
-
-%% Output
-rap.acqdetails.root = '/outputs';
-rap.directoryconventions.analysisid = 'ds114_test1';
 
 % Computing
 rap.directoryconventions.poolprofile = 'local_sh';
