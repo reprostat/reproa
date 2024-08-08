@@ -3,26 +3,18 @@
 
 ## Description
 
-[BIDS App](http://bids-apps.neuroimaging.io) containing an instance of the [ReproAnalysis (_reproa_) software](http://github.com/reprostat/reproanalysis) running under [Octave](https://octave.org) with minimum dependencies, including
+[BIDS App](http://bids-apps.neuroimaging.io) containing an instance of the [ReproAnalysis (_reproa_) software](http://github.com/reprostat/reproanalysis) (core only) running under [Octave](https://octave.org) with minimum dependencies, including
 - [BIDS Validator](https://github.com/bids-standard/bids-validator)
 - [SPM](http://www.fil.ion.ucl.ac.uk/spm)
 
+N.B.: As it is a core-only version, it supports only the use cases of ReproAnalysis without any extension.
 
 ## Documentation
 
-More documentation can be found at [the ReproStat project website](http://github.com/reprostat).
+More documentation can be found at the [ReproStat project website](http://github.com/reprostat).
 
 
 ## Usage
-
-### Notes on figure and video generation
-Octave relies on a QT backend for graphics. It requires access to the display, which must be provided by passing a couple of variables and volumes to the container. The processing pipeline uses a couple of Octave packages, which will be downloaded and installed if needed. It requires access to the internet, which must be provided by passing `--network=host` to the container. Therefore, the list of parameters for launching this BIDS App may be more exhaustive than for other BIDS Apps.
-
-### Notes on the configuration files
-ReproAnalysis BIDS App requires configuration files to [specify the analysis workflow](#specification-of-the-workflow). Without them, you can only use the most basic functionalities, incluing accessing help and version info and running the BIDS validator.
-Two files need to be provided:
-- [tasklist](#tasklist)
-- [user script](#user-script)
 
 ### Format
 To launch an instance of the container and analyse some data in BIDS format, type:
@@ -58,6 +50,32 @@ $ docker run -ti --rm \
 	bids/reproa /data /output group --config /cfg/tasklist.xml,/cfg/userscript.m
 ```
 
+### Notes on figure and video generation
+Octave relies on a QT backend for graphics. It requires access to the display, which must be provided by passing a couple of variables and volumes to the container. The processing pipeline uses a couple of Octave packages, which will be downloaded and installed if needed. It requires access to the internet, which must be provided by passing `--network=host` to the container. Therefore, the list of parameters for launching this BIDS App may be more exhaustive than for other BIDS Apps.
+
+### Notes on the configuration files
+ReproAnalysis BIDS App requires configuration files to [specify the analysis workflow](#specification-of-the-workflow). Without them, you can only use the most basic functionalities, incluing accessing help and version info and running the BIDS validator.
+Two files need to be provided:
+- [tasklist](#tasklist)
+- [user script](#user-script)
+
+You can use the same files for the ReproAnalysis BIDS App as for the ReproAnalysis software unless described otherwise. Any path, of course, MUST correspond to that of the BIDS App rather than the local file system. See also the [Notes on output location](#notes-on-output-location).
+
+#### Tasklist
+The first file specifies workflow based on the tasklist. It is an XML file and follows the same structure as for the ReproAnalysis software. You can find examples in the test folder:
+- [ds_114_test1.xml](tests/ds114_test1.xml)
+- [ds_114_test2.xml](tests/ds114_test2.xml)
+
+#### User script
+The second file is the user script parametrising the workflow. It is an OCTAVE/MATLAB M-file and follows the same structure as for the ReproAnalysis software with a few exceptions. 
+- You MUST NOT call `reproaSetup` and `reproaWorkflow` but consider them already executed based on the tasklist by the time of the execution of your script.
+- You MUST NOT specify `rap.directoryconventions.rawdatadir`, as it is already set to point to the BIDS dataset. However, you MUST call `processBIDS`, as your customisation may define its behaviour.
+- You MUST NOT specify `rap.acqdetails.root` and `rap.directoryconventions.analysisid`, as they will be set to point to the BIDS App output and the script name, respectively.
+
+You can find examples in the test folder:
+- [ds_114_test1.m](tests/ds114_test1.m)
+- [ds_114_test2.m](tests/ds114_test2.m)
+
 ### Notes on output location
 ReproAnalysis generates various HTML reports with link to diagnostic images of the analysis. ReproAnalysis uses full path so that moving the HTMLs does not break the references. 
 
@@ -75,24 +93,6 @@ You can avoid the need for correcting the paths by mounting the output as it is 
 	...
 	bids/reproa /data /path/to/local/output ...
 ```
-
-### Specification of the workflow
-You can use the same files for the ReproAnalysis BIDS App as for the ReproAnalysis software. The path settings, of course, MUST correspond to those of the BIDS App rather than the local file system. See also the [Notes on output location](#notes-on-output-location).
-
-#### Tasklist
-The first file specifies workflow based on the tasklist. It is an XML file and follows a simple structure. You can find examples in the test folder:
-- [ds_114_test1.xml](tests/ds114_test1.xml)
-- [ds_114_test2.xml](tests/ds114_test2.xml)
-
-#### User script
-The second file is the user script parametrising the workflow. It is an OCTAVE/MATLAB M-file and follows the same structure as for the ReproAnalysis software with a few exceptions. 
-- You MUST NOT call `reproaSetup` and `reproaWorkflow` but consider them already executed based on the tasklist by the time of the execution of your script.
-- You MUST NOT specify `rap.directoryconventions.rawdatadir`, as it is already set to point to the BIDS dataset. However, you MUST call `processBIDS`, as your customisation may define its behaviour.
-- You MUST NOT specify `ap.acqdetails.root` and `rap.directoryconventions.analysisid`, as they will be set to point to the BIDS App output and the script name, respectively.
-
-You can find examples in the test folder:
-- [ds_114_test1.m](tests/ds114_test1.m)
-- [ds_114_test2.m](tests/ds114_test2.m)
 
 
 ## Development
