@@ -38,26 +38,15 @@ jobs:
   test:
     machine:
       image: ubuntu-2204:2022.10.2
-
-    environment:
-      GITHUB_WORKSPACE: /home/circleci/reproanalysis
-
     parameters:
       dataset:
         type: string
-
     steps:
+    - checkout
     - attach_workspace:
         at: /tmp/workspace
-
-    - run:
-        name: Checkout repo
-        command: git clone "$CIRCLE_REPOSITORY_URL" "$GITHUB_WORKSPACE"    
-
     - run: docker load -i /tmp/workspace/docker/image.tar
-
     - run: mkdir -p ${HOME}/outputs<< parameters.dataset >>
-
     - run:
         name: Print version
         command: |
@@ -66,7 +55,6 @@ jobs:
             --volume=/tmp/workspace/data/ds114_test1:/bids_dataset \
             bids/${CIRCLE_PROJECT_REPONAME,,} --version
         no_output_timeout: 1h
-
     - run:
         name: Participant level test for 01
         command: |
@@ -75,12 +63,11 @@ jobs:
             --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:ro" --volume="${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}:rw" \
             --volume=/tmp/workspace/data/ds114_test<< parameters.dataset >>:/bids_dataset \
             --volume=${HOME}/outputs<< parameters.dataset >>/participant:/outputs \
-            --volume=$GITHUB_WORKSPACE/tests:/config \
+            --volume=${PWD}/tests:/config \
             bids/${CIRCLE_PROJECT_REPONAME,,} /bids_dataset /outputs participant --participant_label 01 \
             --config /config/ds114_test<< parameters.dataset >>.xml,/config/ds114_test<< parameters.dataset >>.m \
             --skip_bids_validator
         no_output_timeout: 6h
-
     - run:
         name: Participant level test for 02
         command: |
@@ -89,12 +76,11 @@ jobs:
             --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:ro" --volume="${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}:rw" \
             --volume=/tmp/workspace/data/ds114_test<< parameters.dataset >>:/bids_dataset \
             --volume=${HOME}/outputs<< parameters.dataset >>/participant:/outputs \
-            --volume=$GITHUB_WORKSPACE/tests:/config \
+            --volume=${PWD}/tests:/config \
             bids/${CIRCLE_PROJECT_REPONAME,,} /bids_dataset /outputs participant --participant_label 02 \
             --config /config/ds114_test<< parameters.dataset >>.xml,/config/ds114_test<< parameters.dataset >>.m \
             --skip_bids_validator
         no_output_timeout: 6h
-    
     - run:
         name: Group level test    
         command: |
@@ -103,27 +89,36 @@ jobs:
             --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:ro" --volume="${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}:rw" \
             --volume=/tmp/workspace/data/ds114_test<< parameters.dataset >>:/bids_dataset \
             --volume=${HOME}/outputs<< parameters.dataset >>/group:/outputs \
-            --volume=$GITHUB_WORKSPACE/tests:/config \
+            --volume=${PWD}/tests:/config \
             bids/${CIRCLE_PROJECT_REPONAME,,} /bids_dataset /outputs group \
             --config /config/ds114_test<< parameters.dataset >>.xml,/config/ds114_test<< parameters.dataset >>.m \
             --skip_bids_validator
         no_output_timeout: 6h
-
     - store_artifacts:
         path: ~/output<< parameters.dataset >>
 
   deploy:
-
     machine:
       image: ubuntu-2204:2022.10.2
-
     steps:
     - attach_workspace:
         at: /tmp/workspace
-
     - run: docker load -i /tmp/workspace/docker/image.tar
     - run:
-        name: push to dockerhub
+        name: Publish (reprostat)
+        command: |
+          if [[ -z "${CIRCLE_TAG}" ]]; then
+              echo "Not tagged --> skipping"
+          elif [[ -z "${DOCKER_TOKEN}" ]]; then
+              echo "Docker authentication not detected --> failed"
+              exit 1
+          else              
+              echo ${DOCKER_TOKEN} | docker login -u ${DOCKER_USER} --password-stdin
+              docker tag reprostat/${CIRCLE_PROJECT_REPONAME} reprostat/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}
+              docker push --all-tags reprostat/${CIRCLE_PROJECT_REPONAME}
+          fi
+    - run:
+        name: Publish (bids)
         command: |
           wget https://raw.githubusercontent.com/bids-apps/maintenance-tools/main/circleci/push_docker.sh
           bash push_docker.sh
@@ -131,13 +126,19 @@ jobs:
 workflows:
   build-test-deploy:
     jobs:
-    - build
+    - build:
+        filters:
+          tags:
+            only: /\d+\.\d+\.\d+/
     - test:
         requires:
         - build
         matrix:
           parameters:
             dataset: ['1', '2']
+        filters:
+          tags:
+            only: /\d+\.\d+\.\d+/
     - deploy:
         context:
         - dockerhub
@@ -145,4 +146,6 @@ workflows:
         - test
         filters:
           tags:
-            only: /.*/
+            only: /\d+\.\d+\.\d+/
+          branches:
+            ignore: /.*/
