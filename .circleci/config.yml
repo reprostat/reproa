@@ -56,7 +56,7 @@ jobs:
             bids/${CIRCLE_PROJECT_REPONAME,,} --version
         no_output_timeout: 1h
     - run:
-        name: Participant level test for 01
+        name: Run single-subject analysis on << parameters.participant >>
         command: |
           mkdir -p ${HOME}/outputs<< parameters.dataset >>/participant
           docker run -ti --rm \
@@ -64,33 +64,7 @@ jobs:
             --volume=/tmp/workspace/data/ds114_test<< parameters.dataset >>:/bids_dataset \
             --volume=${HOME}/outputs<< parameters.dataset >>/participant:/outputs \
             --volume=${PWD}/tests:/config \
-            bids/${CIRCLE_PROJECT_REPONAME,,} /bids_dataset /outputs participant --participant_label 01 \
-            --config /config/ds114_test<< parameters.dataset >>.xml,/config/ds114_test<< parameters.dataset >>.m \
-            --skip_bids_validator
-        no_output_timeout: 6h
-    - run:
-        name: Participant level test for 02
-        command: |
-          mkdir -p ${HOME}/outputs<< parameters.dataset >>/participant
-          docker run -ti --rm \
-            --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:ro" --volume="${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}:rw" \
-            --volume=/tmp/workspace/data/ds114_test<< parameters.dataset >>:/bids_dataset \
-            --volume=${HOME}/outputs<< parameters.dataset >>/participant:/outputs \
-            --volume=${PWD}/tests:/config \
-            bids/${CIRCLE_PROJECT_REPONAME,,} /bids_dataset /outputs participant --participant_label 02 \
-            --config /config/ds114_test<< parameters.dataset >>.xml,/config/ds114_test<< parameters.dataset >>.m \
-            --skip_bids_validator
-        no_output_timeout: 6h
-    - run:
-        name: Group level test    
-        command: |
-          mkdir -p ${HOME}/outputs<< parameters.dataset >>/group
-          docker run -ti --rm \
-            --user $(id -u):$(id -g) --network=host --env="DISPLAY" --env="HOME" --env="XDG_RUNTIME_DIR" --volume="$HOME:$HOME:rw" --volume="/dev:/dev:ro" --volume="${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}:rw" \
-            --volume=/tmp/workspace/data/ds114_test<< parameters.dataset >>:/bids_dataset \
-            --volume=${HOME}/outputs<< parameters.dataset >>/group:/outputs \
-            --volume=${PWD}/tests:/config \
-            bids/${CIRCLE_PROJECT_REPONAME,,} /bids_dataset /outputs group \
+            bids/${CIRCLE_PROJECT_REPONAME,,} /bids_dataset /outputs participant --participant_label << parameters.participant >> \
             --config /config/ds114_test<< parameters.dataset >>.xml,/config/ds114_test<< parameters.dataset >>.m \
             --skip_bids_validator
         no_output_timeout: 6h
@@ -136,6 +110,7 @@ workflows:
         matrix:
           parameters:
             dataset: ['1', '2']
+            participant: ['01', '02']
         filters:
           tags:
             only: /\d+\.\d+\.\d+/
