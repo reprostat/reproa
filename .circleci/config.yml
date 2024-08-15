@@ -41,6 +41,8 @@ jobs:
     parameters:
       dataset:
         type: string
+      participant:
+        type: string
     steps:
     - checkout
     - attach_workspace:
@@ -56,7 +58,7 @@ jobs:
             bids/${CIRCLE_PROJECT_REPONAME,,} --version
         no_output_timeout: 1h
     - run:
-        name: Run single-subject analysis
+        name: Run single-subject analysis on << parameters.participant >>
         command: |
           mkdir -p ${HOME}/outputs<< parameters.dataset >>/participant
           docker run -ti --rm \
