@@ -56,7 +56,7 @@ jobs:
             bids/${CIRCLE_PROJECT_REPONAME,,} --version
         no_output_timeout: 1h
     - run:
-        name: Run single-subject analysis on << parameters.participant >>
+        name: Run single-subject analysis
         command: |
           mkdir -p ${HOME}/outputs<< parameters.dataset >>/participant
           docker run -ti --rm \
