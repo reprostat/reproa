@@ -1,6 +1,6 @@
 # ReproAnalysis BIDS App
 
-![Docker Image Version](https://img.shields.io/docker/v/reprostat/reproa) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/reprostat/reproa/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/reprostat/reproa/tree/master)
+[![Docker Image Version](https://img.shields.io/docker/v/reprostat/reproa)](https://hub.docker.com/r/reprostat/octave) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/reprostat/reproa/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/reprostat/reproa/tree/master)
 
 ## Description
 
