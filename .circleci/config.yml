@@ -83,21 +83,20 @@ jobs:
     - run:
         name: Publish (reprostat)
         command: |
-          if [[ -z "${CIRCLE_TAG}" ]]; then
-              echo "Not tagged --> skipping"
-          elif [[ -z "${DOCKER_TOKEN}" ]]; then
+          if [[ -z "${REPROSTAT_TOKEN}" ]]; then
               echo "Docker authentication not detected --> failed"
               exit 1
           else              
-              echo ${DOCKER_TOKEN} | docker login -u ${DOCKER_USER} --password-stdin
+              echo ${REPROSTAT_TOKEN} | docker login -u ${REPROSTAT_USER} --password-stdin
+              docker tag bids/${CIRCLE_PROJECT_REPONAME} reprostat/${CIRCLE_PROJECT_REPONAME}
               docker tag reprostat/${CIRCLE_PROJECT_REPONAME} reprostat/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}
               docker push --all-tags reprostat/${CIRCLE_PROJECT_REPONAME}
           fi
-    - run:
-        name: Publish (bids)
-        command: |
-          wget https://raw.githubusercontent.com/bids-apps/maintenance-tools/main/circleci/push_docker.sh
-          bash push_docker.sh
+    #- run:
+    #    name: Publish (bids)
+    #    command: |
+    #      wget https://raw.githubusercontent.com/bids-apps/maintenance-tools/main/circleci/push_docker.sh
+    #      bash push_docker.sh
 
 workflows:
   build-test-deploy:
@@ -118,7 +117,7 @@ workflows:
             only: /\d+\.\d+\.\d+/
     - deploy:
         context:
-        - dockerhub
+        - dockerhub-reprostat
         requires:
         - test
         filters:
